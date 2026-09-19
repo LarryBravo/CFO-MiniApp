@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>CFO Super App</title>
+    <!-- SDK Oficial de Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- TailwindCSS para diseño de lujo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: var(--tg-theme-bg-color, #0f172a);
+            color: var(--tg-theme-text-color, #f8fafc);
+        }
+        .active-tab {
+            border-bottom: 2px solid #38bdf8;
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body class="p-4 font-sans select-none pb-20">
+
+    <!-- ENCABEZADO -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-xl font-bold tracking-wide">CFO Assistant</h1>
+            <p class="text-xs text-slate-400">Registro Financiero Rápido</p>
+        </div>
+        <div class="bg-slate-800 px-3 py-1 rounded-full text-xs text-sky-400 border border-slate-700">
+            v7.0 Pro
+        </div>
+    </div>
+
+    <!-- SELECTOR DE TIPO (Gasto vs Ingreso) -->
+    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-800 rounded-xl mb-6">
+        <button id="btn-tipo-gasto" onclick="cambiarTipo('gasto')" class="py-2 text-sm font-semibold rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 transition-all">
+            🔴 Gasto
+        </button>
+        <button id="btn-tipo-ingreso" onclick="cambiarTipo('ingreso')" class="py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+            🟢 Ingreso
+        </button>
+    </div>
+
+    <!-- FORMULARIO PRINCIPAL -->
+    <div class="space-y-4">
+        
+        <!-- MONTO Y MONEDA -->
+        <div>
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Monto</label>
+            <div class="relative flex items-center">
+                <input type="number" step="any" id="input-monto" placeholder="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 px-4 text-2xl font-bold text-white focus:outline-none focus:border-sky-500">
+                <select id="select-moneda" class="absolute right-2 bg-slate-700 text-sm font-semibold text-slate-200 rounded-lg py-1.5 px-3 border border-slate-600 focus:outline-none">
+                    <option value="USD">$ USD</option>
+                    <option value="BS">Bs.</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- CONCEPTO / DESCRIPCIÓN -->
+        <div>
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Concepto</label>
+            <input type="text" id="input-concepto" placeholder="Ej: Cena, Repuestos, Farmacia" class="w-full bg-slate-800 border border-slate-700 rounded-xl py-2.5 px-4 text-sm text-white focus:outline-none focus:border-sky-500">
+        </div>
+
+        <!-- CUENTA / ORIGEN -->
+        <div>
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Cuenta / Método</label>
+            <select id="select-cuenta" class="w-full bg-slate-800 border border-slate-700 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-sky-500">
+                <option value="Efectivo / Manual">💵 Efectivo / Manual</option>
+                <option value="BNC">🏦 BNC</option>
+                <option value="Mercantil">🏦 Mercantil</option>
+                <option value="Banesco">🏦 Banesco</option>
+                <option value="Provincial">🏦 Provincial</option>
+                <option value="Binance">🪙 Binance (USDT)</option>
+                <option value="Zelle">📱 Zelle</option>
+            </select>
+        </div>
+
+        <!-- CATEGORÍAS (CUADRÍCULA CON ICONOS) -->
+        <div>
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">Categoría Homologada</label>
+            <div id="contenedor-categorias" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                <!-- Se inyectan dinámicamente con JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTÓN DE ENVÍO NATIVO O FLOTANTE -->
+    <div class="fixed bottom-4 left-4 right-4">
+        <button onclick="enviarDatosATelegram()" class="w-full bg-sky-500 hover:bg-sky-400 active:scale-[0.98] text-slate-900 font-bold py-3.5 rounded-xl shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center space-x-2">
+            <span>Guardar en Firebase</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </button>
+    </div>
+
+    <!-- LÓGICA DE CONTROL (JAVASCRIPT) -->
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Abre la app ocupando toda la pantalla del celular
+
+        // FUENTE DE LA VERDAD (Homologada con settings.py)
+        const CATEGORIAS_GASTOS = {
+            "Supermercado": "🛒", "Carnicería / Dieta": "🥩", "Comida / Salidas": "🍔",
+            "Gasolina": "⛽", "Auto (Lancer)": "🚗", "Beily (Mascota)": "🐶",
+            "Servicios / Airtek": "💡", "Artículos de Hogar": "🧹", "Gimnasio / Suplementos": "💪",
+            "Cuidado Personal": "✂️", "Gastos Thainy": "👩‍❤️‍👨", "Comisiones Bancarias": "🏦",
+            "Otro / Desconocido": "🤷‍♂️"
+        };
+
+        const CATEGORIAS_INGRESOS = {
+            "Salario / Ingreso Principal": "💼", "Ingreso por Arbitraje": "🔄",
+            "Venta de Divisas": "💵", "Otro Ingreso": "➕"
+        };
+
+        let tipoActual = 'gasto';
+        let categoriaSeleccionada = "Supermercado";
+
+        function cambiarTipo(nuevoTipo) {
+            tipoActual = nuevoTipo;
+            const btnGasto = document.getElementById('btn-tipo-gasto');
+            const btnIngreso = document.getElementById('btn-tipo-ingreso');
+
+            if (tipoActual === 'gasto') {
+                btnGasto.className = "py-2 text-sm font-semibold rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 transition-all";
+                btnIngreso.className = "py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all";
+                categoriaSeleccionada = "Supermercado";
+            } else {
+                btnIngreso.className = "py-2 text-sm font-semibold rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all";
+                btnGasto.className = "py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all";
+                categoriaSeleccionada = "Salario / Ingreso Principal";
+            }
+            renderizarCategorias();
+        }
+
+        function renderizarCategorias() {
+            const contenedor = document.getElementById('contenedor-categorias');
+            contenedor.innerHTML = '';
+            const lista = tipoActual === 'gasto' ? CATEGORIAS_GASTOS : CATEGORIAS_INGRESOS;
+
+            for (const [nombre, emoji] of Object.entries(lista)) {
+                const esActiva = (nombre === categoriaSeleccionada);
+                const card = document.createElement('button');
+                card.type = "button";
+                card.className = `flex items-center space-x-2 p-2.5 rounded-xl border text-left text-xs font-medium transition-all ${
+                    esActiva 
+                    ? 'bg-sky-500/20 border-sky-500 text-sky-300' 
+                    : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/50'
+                }`;
+                card.innerHTML = `<span class="text-base">${emoji}</span><span class="truncate">${nombre}</span>`;
+                card.onclick = () => {
+                    categoriaSeleccionada = nombre;
+                    renderizarCategorias();
+                };
+                contenedor.appendChild(card);
+            }
+        }
+
+        function enviarDatosATelegram() {
+            const monto = document.getElementById('input-monto').value;
+            const concepto = document.getElementById('input-concepto').value || "Sin descripción";
+            const moneda = document.getElementById('select-moneda').value;
+            const cuenta = document.getElementById('select-cuenta').value;
+
+            if (!monto || parseFloat(monto) <= 0) {
+                tg.HapticFeedback.notificationOccurred('error');
+                alert("Por favor ingresa un monto válido.");
+                return;
+            }
+
+            // Paquete de datos que recibirá Python
+            const payload = {
+                tipo: tipoActual,
+                monto: parseFloat(monto),
+                moneda: moneda,
+                concepto: concepto,
+                cuenta: cuenta,
+                categoria: categoriaSeleccionada
+            };
+
+            // Vibración táctil háptica en el celular
+            tg.HapticFeedback.notificationOccurred('success');
+            
+            // Envía la data a Python y cierra la pantalla
+            tg.sendData(JSON.stringify(payload));
+        }
+
+        // Renderizado inicial
+        renderizarCategorias();
+    </script>
+</body>
+</html>
