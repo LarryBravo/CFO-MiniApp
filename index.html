@@ -97,7 +97,16 @@
                     <span>Cuota del mes: <b id="cfo-cuota-bebe" class="text-amber-400">$0/mes</b></span>
                 </div>
             </div>
-
+            <!-- LISTA DE CUENTAS BANCARIAS REALES -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Mis Cuentas y Saldos</h3>
+                    <span class="text-[10px] text-emerald-400 font-bold">Sincronizado</span>
+                </div>
+                <div id="lista-cuentas-bancarias" class="space-y-2 max-h-52 overflow-y-auto pr-1 text-xs">
+                    <!-- Se llena con tus cuentas reales en JS -->
+                </div>
+            </div>
             <!-- GRÁFICO DE DONA (CHART.JS) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
                 <div class="flex justify-between items-center mb-2">
@@ -479,6 +488,7 @@
         // INICIALIZADOR DE DASHBOARD
         // ==========================================
         function inicializarDashboard() {
+            // Reemplazar textos superiores
             document.getElementById('patrimonio-total-display').innerText = `$${APP_DATA.patrimonio_total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             document.getElementById('liquidez-display').innerText = `$${APP_DATA.liquidez_libre.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             document.getElementById('tasa-bcv-display').innerText = `${APP_DATA.tasa_bcv.toFixed(2)} Bs/$`;
@@ -486,31 +496,47 @@
             document.getElementById('total-deudores-display').innerText = `$${APP_DATA.deudores.total.toFixed(2)} USD`;
             document.getElementById('porcentaje-mes-display').innerText = `Día ${APP_DATA.dia_actual} de ${APP_DATA.dias_totales}`;
 
-            // Lista deudores
+            // 1. PINTAR TUS CUENTAS BANCARIAS REALES
+            const contCuentas = document.getElementById('lista-cuentas-bancarias');
+            contCuentas.innerHTML = '';
+            
+            if (APP_DATA.cuentas && APP_DATA.cuentas.length > 0) {
+                APP_DATA.cuentas.forEach(c => {
+                    let saldosHtml = '';
+                    if (c.bs && c.bs !== "0" && c.bs !== "0,00") saldosHtml += `<span class="text-slate-300 font-semibold block">Bs. ${c.bs}</span>`;
+                    if (c.usd && c.usd !== "0" && c.usd !== "0,00") saldosHtml += `<span class="text-emerald-400 font-bold block">$ ${c.usd}</span>`;
+                    
+                    contCuentas.innerHTML += `
+                        <div class="flex justify-between items-center p-2 rounded-xl bg-slate-800/50 border border-slate-700/40">
+                            <div>
+                                <span class="font-bold text-white block">${c.banco}</span>
+                                <span class="text-[10px] text-slate-400">${c.nombre}</span>
+                            </div>
+                            <div class="text-right text-[11px]">
+                                ${saldosHtml || '<span class="text-slate-500">$0.00</span>'}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // 2. PINTAR TUS DEUDORES REALES
             const contDeudores = document.getElementById('lista-deudores-detalle');
             contDeudores.innerHTML = '';
-            if (APP_DATA.deudores.lista.length > 0) {
+            if (APP_DATA.deudores.lista && APP_DATA.deudores.lista.length > 0) {
                 APP_DATA.deudores.lista.forEach(d => {
                     contDeudores.innerHTML += `
-                        <div class="flex justify-between text-slate-300">
+                        <div class="flex justify-between text-slate-300 py-0.5">
                             <span>👤 ${d.nombre}</span>
                             <span class="font-bold text-emerald-400">+$${d.monto.toFixed(2)}</span>
                         </div>
                     `;
                 });
             } else {
-                contDeudores.innerHTML = '<p class="text-slate-500">Nadie te debe dinero actualmente.</p>';
+                contDeudores.innerHTML = '<p class="text-slate-500 py-1">Nadie te debe dinero actualmente.</p>';
             }
 
-            // CFO Bebé
-            const cfo = APP_DATA.cfo_progreso;
-            document.getElementById('cfo-dias-bebe').innerText = `Faltan ${cfo.dias_bebe} días`;
-            document.getElementById('cfo-ahorro-bebe').innerText = `$${cfo.ahorro_bebe.toLocaleString()}`;
-            document.getElementById('cfo-cuota-bebe').innerText = `$${cfo.cuota_bebe.toFixed(0)}/mes`;
-            const pctBebe = Math.min(100, Math.round((cfo.ahorro_bebe / cfo.meta_bebe) * 100));
-            document.getElementById('cfo-barra-bebe').style.width = `${pctBebe}%`;
-
-            // Barras presupuesto clickeables
+            // 3. PINTAR PRESUPUESTO REAL
             const contBarras = document.getElementById('lista-barras-presupuesto');
             contBarras.innerHTML = '';
             for (const [cat, info] of Object.entries(APP_DATA.presupuesto)) {
@@ -518,7 +544,7 @@
                 const color = pct >= 100 ? 'bg-rose-500' : pct > 75 ? 'bg-amber-500' : 'bg-sky-500';
 
                 contBarras.innerHTML += `
-                    <div onclick="abrirDesglose('${cat}')" class="cursor-pointer active:opacity-75 transition-all p-2 rounded-xl hover:bg-slate-800/40">
+                    <div onclick="abrirDesglose('${cat}')" class="cursor-pointer active:opacity-75 transition-all p-1.5 rounded-xl hover:bg-slate-800/40">
                         <div class="flex justify-between text-xs mb-1">
                             <span class="font-medium text-slate-200">${cat}</span>
                             <span class="font-bold text-slate-300">$${info.gastado} / $${info.limite} (${pct}%)</span>
@@ -530,7 +556,7 @@
                 `;
             }
 
-            // Donut Chart
+            // 4. DONUT CHART
             const ctx = document.getElementById('donutChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
@@ -549,7 +575,6 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, color: '#94a3b8', font: { size: 10 } } } } }
             });
         }
-
         // ==========================================
         // INICIALIZADOR DE SINKING FUNDS (SOBRES)
         // ==========================================
