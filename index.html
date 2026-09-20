@@ -361,51 +361,25 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
-        // DATOS MOCK DE RESPALDO (Por si se prueba fuera de Telegram)
+            // PLANTILLA BASE LIMPIA (Sin datos falsos de muestra)
         let APP_DATA = {
-            patrimonio_total: 8115.58, liquidez_libre: 4014.88, tasa_bcv: 848.55, corte: "Hoy",
-            ingresos_mes: 2583.53, gastado_mes: 1399.76, ahorro_exigido: 1298.53, dia_actual: 20, dias_totales: 30,
-            cuentas: [
-                { banco: "BNC", nombre: "Cuenta Corriente", bs: "273,76", usd: "290,00" },
-                { banco: "Mercantil", nombre: "Cuenta Principal", bs: "1.369,22", usd: "102,62" },
-                { banco: "Provincial", nombre: "Cuenta Sueldo", bs: "4.031,41", usd: "330,61" },
-                { banco: "Binance", nombre: "Spot & Earn", bs: "0", usd: "2.253,10" }
-            ],
-            otros_activos: [
-                { descripcion: "Efectivo USD", monto: 190, moneda: "USD" },
-                { descripcion: "Zelle", monto: 351, moneda: "USD" }
-            ],
-            deudores: { total: 515.58, lista: [{ nombre: "Juan Pérez", monto: 40.0 }] },
-            presupuesto: {
-                "Supermercado": { gastado: 239, limite: 325 },
-                "Carnicería / Dieta": { gastado: 111, limite: 125 },
-                "Arrendamiento": { gastado: 60, limite: 410 },
-                "Servicios / Airtek": { gastado: 58, limite: 45 },
-                "Beily (Mascota)": { gastado: 83, limite: 70 },
-                "Gasolina": { gastado: 60, limite: 60 },
-                "Comida / Salidas": { gastado: 61, limite: 100 },
-                "Gastos Thainy": { gastado: 87, limite: 90 },
-                "Artículos de Hogar": { gastado: 264, limite: 20 },
-                "Otro / Desconocido": { gastado: 150, limite: 0 }
-            },
-            gastos_por_categoria: {
-                "Supermercado": 239, "Carnicería / Dieta": 111, "Arrendamiento": 60,
-                "Servicios / Airtek": 58, "Beily (Mascota)": 83, "Gasolina": 60,
-                "Comida / Salidas": 61, "Gastos Thainy": 87, "Artículos de Hogar": 264,
-                "Otro / Desconocido": 150
-            },
-            transacciones: [
-                ["TX-1", "18/09", "Supermercado", "Compra Víveres", 45.0],
-                ["TX-2", "15/09", "Carnicería / Dieta", "Carne y Pollo", 35.0],
-                ["TX-3", "12/09", "Gasolina", "Estación Servicio", 20.0],
-                ["TX-4", "10/09", "Otro / Desconocido", "Punto de Venta no registrado", 150.0]
-            ],
-            sinking_funds: {
-                "Bebé (Meta 2027)": { actual: 3500, meta: 10000, emoji: "🍼" },
-                "Lancer (Repuestos)": { actual: 400, meta: 600, emoji: "🚗" }
-            },
-            cfo_progreso: { cuota_bebe: 150, dias_bebe: 900, ahorro_bebe: 3500, meta_bebe: 10000 }
+            patrimonio_total: 0.00, 
+            liquidez_libre: 0.00, 
+            tasa_bcv: 1.0, 
+            corte: "Sincronizando...",
+            ingresos_mes: 0.00, 
+            gastado_mes: 0.00, 
+            ahorro_exigido: 0.00, 
+            dia_actual: 1, 
+            dias_totales: 30,
+            cuentas: [], 
+            otros_activos: [], 
+            deudores: { total: 0, lista: [] },
+            presupuesto: {}, 
+            gastos_por_categoria: {}, 
+            transacciones: [], 
+            sinking_funds: {},
+            cfo_progreso: { cuota_bebe: 0, dias_bebe: 0, ahorro_bebe: 0, meta_bebe: 10000 }
         };
 
         // LEER PAYLOAD DINÁMICO ENVIADO POR PYTHON DESDE EL URL (BASE64)
