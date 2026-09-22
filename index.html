@@ -208,7 +208,7 @@
                 <!-- SELECTOR CATEGORÍA -->
                 <div>
                     <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2">Categoría Homologada</label>
-                    <div id="contenedor-categorias" class="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1 hide-scrollbar"></div>
+                    <div id="contenedor-categorias" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"></div>
                 </div>
 
                 <button onclick="enviarDatosATelegram()" class="w-full mt-2 bg-sky-500 hover:bg-sky-400 active:scale-[0.99] text-slate-950 font-black py-3.5 rounded-xl shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2">
@@ -1060,10 +1060,22 @@
         // 6. FORMULARIO DE REGISTRO RÁPIDO
         // ==========================================
         const CATEGORIAS_GASTOS = {
-            "Supermercado": "🛒", "Carnicería / Dieta": "🥩", "Comida / Salidas": "🍔",
-            "Gasolina": "⛽", "Auto (Lancer)": "🚗", "Beily (Mascota)": "🐶",
-            "Servicios / Airtek": "💡", "Artículos de Hogar": "🧹", "Gimnasio / Suplementos": "💪",
-            "Cuidado Personal": "✂️", "Gastos Thainy": "👩‍❤️‍👨", "Comisiones Bancarias": "🏦", "Otro / Desconocido": "🤷‍♂️"
+            "Supermercado": "🛒", 
+            "Carnicería / Dieta": "🥩", 
+            "Arrendamiento": "🏠",               // <--- ¡AQUÍ ESTÁ EL ALQUILER!
+            "Servicios / Airtek": "💡", 
+            "Artículos de Hogar": "🧹", 
+            "Gasolina": "⛽", 
+            "Auto (Lancer)": "🚗", 
+            "Beily (Mascota)": "🐶", 
+            "Comida / Salidas": "🍔", 
+            "Gimnasio / Suplementos": "💪", 
+            "Cuidado Personal": "✂️", 
+            "Gastos Thainy": "👩‍❤️‍👨", 
+            "Inversiones (IBKR)": "📈",
+            "Comisiones Bancarias": "🏦",
+            "Transferencia Interna": "🔄",
+            "Otro / Desconocido": "🤷‍♂️"
         };
         const CATEGORIAS_INGRESOS = {
             "Salario / Ingreso Principal": "💼", "Ingreso por Arbitraje": "🔄", "Venta de Divisas": "💵", "Otro Ingreso": "➕"
