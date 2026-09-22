@@ -37,21 +37,7 @@
             <span id="tasa-bcv-display" class="text-xs font-black text-emerald-400">-- Bs/$</span>
         </div>
     </header>
-    <!-- NAVEGADOR DE MESES HISTÓRICOS (SELECTOR TEMPORAL) -->
-    <div class="px-4 pt-3 flex items-center justify-between">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-1 flex items-center justify-between w-full max-w-xs mx-auto shadow-md">
-            <button onclick="cambiarMesRelativo(-1)" id="btn-mes-anterior" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center font-bold active:scale-90 transition-all">
-                ◀
-            </button>
-            <div class="text-center px-2">
-                <span id="mes-activo-label" class="text-xs font-black text-white block capitalize">Septiembre 2026</span>
-                <span id="mes-subtitulo-status" class="text-[9px] text-sky-400 font-semibold block">Mes en curso</span>
-            </div>
-            <button onclick="cambiarMesRelativo(1)" id="btn-mes-siguiente" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center font-bold active:scale-90 transition-all">
-                ▶
-            </button>
-        </div>
-    </div>
+
     <!-- ============================================================ -->
     <!-- CONTENIDO PRINCIPAL (5 PESTAÑAS)                             -->
     <!-- ============================================================ -->
@@ -74,7 +60,7 @@
                     <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
                     <span class="text-[11px] font-medium text-slate-400 block mb-0.5">Liquidez Libre (Caja)</span>
                     <span id="liquidez-display" class="text-lg font-black text-sky-400 tracking-tight">$0.00</span>
-                    <span class="text-[10px] text-slate-400 font-medium block mt-1">Dinero intocable fuera</span>
+                    <span class="text-[10px] text-slate-400 font-medium block mt-1">Disponible real</span>
                 </div>
             </div>
 
@@ -116,6 +102,16 @@
         <!-- PESTAÑA 2: PRESUPUESTO & AUDITORÍA DE TORTA                 -->
         <!-- ============================================================ -->
         <section id="tab-presupuesto" class="hidden space-y-4">
+
+            <!-- NAVEGADOR DE MESES HISTÓRICOS -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2 flex items-center justify-between shadow-md">
+                <button onclick="cambiarMesRelativo(-1)" id="btn-mes-anterior" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center font-black active:scale-90 transition-all">◀</button>
+                <div class="text-center px-2">
+                    <span id="mes-activo-label" class="text-xs font-black text-white block capitalize">Septiembre 2026</span>
+                    <span id="mes-subtitulo-status" class="text-[9px] text-sky-400 font-bold block">Mes en curso</span>
+                </div>
+                <button onclick="cambiarMesRelativo(1)" id="btn-mes-siguiente" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center font-black active:scale-90 transition-all">▶</button>
+            </div>
 
             <!-- SELECTOR Y GRÁFICO DE TORTA DUAL -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
@@ -163,7 +159,7 @@
         </section>
 
         <!-- ============================================================ -->
-        <!-- PESTAÑA 3: REGISTRO RÁPIDO                                   -->
+        <!-- PESTAÑA 3: REGISTRO RÁPIDO (GASTO / INGRESO)                -->
         <!-- ============================================================ -->
         <section id="tab-registro" class="hidden space-y-4">
             
@@ -232,7 +228,7 @@
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                        <span>📜</span> Historial de Gastos del Mes
+                        <span>📜</span> Historial de Gastos
                     </h3>
                     <span id="contador-transacciones" class="text-[10px] text-sky-400 font-bold">0 ítems</span>
                 </div>
@@ -246,20 +242,19 @@
                 <!-- Selector de Filtro de Categoría -->
                 <select id="filtro-categoria-movs" onchange="filtrarMovimientos()" class="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-3 text-xs text-slate-300 outline-none">
                     <option value="TODAS">📁 Todas las categorías</option>
-                    <!-- Se llena dinámicamente con JS -->
                 </select>
+
+                <!-- BARRA FLOTANTE DE BORRADO EN LOTE -->
+                <div id="barra-borrado-lote" class="hidden p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center justify-between transition-all">
+                    <span id="txt-seleccionados" class="text-xs font-bold text-rose-300">0 seleccionados</span>
+                    <button onclick="eliminarSeleccionadosLote()" class="px-3 py-1.5 rounded-lg bg-rose-500 text-slate-950 font-black text-xs active:scale-95 shadow-md shadow-rose-500/20">
+                        🗑️ Eliminar Lote
+                    </button>
+                </div>
             </div>
-            <!-- BARRA FLOTANTE DE BORRADO EN LOTE (Aparece cuando seleccionas casillas) -->
-            <div id="barra-borrado-lote" class="hidden p-3 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center justify-between transition-all">
-                <span id="txt-seleccionados" class="text-xs font-bold text-rose-300">0 seleccionados</span>
-                <button onclick="eliminarSeleccionadosLote()" class="px-3.5 py-1.5 rounded-xl bg-rose-500 text-slate-950 font-black text-xs active:scale-95 shadow-md shadow-rose-500/20">
-                    🗑️ Eliminar Lote
-                </button>
-            </div>
-            <!-- FEED DE TRANSACCIONES CON BOTÓN DE BORRAR -->
-            <div id="lista-movimientos-completa" class="space-y-2">
-                <!-- Se llena dinámicamente con JS -->
-            </div>
+
+            <!-- FEED DE TRANSACCIONES -->
+            <div id="lista-movimientos-completa" class="space-y-2"></div>
 
         </section>
 
@@ -299,7 +294,7 @@
                     <span>🔮</span> Simulador de Impacto Predictivo
                 </h3>
                 <div>
-                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Gasto que estás pensando hacer ($)</label>
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Gasto a evaluar ($)</label>
                     <input type="number" id="simulador-input" value="100" oninput="actualizarSimulador(this.value)" class="w-full bg-transparent text-3xl font-black text-white outline-none mb-3">
                     <input type="range" id="simulador-slider" min="10" max="1000" step="10" value="100" oninput="actualizarSimulador(this.value)" class="w-full accent-sky-500">
                 </div>
@@ -343,8 +338,16 @@
                 </div>
 
                 <div id="pnl-card-resultado" class="border border-emerald-500/30 bg-emerald-500/10 p-3.5 rounded-2xl text-center">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-bold uppercase text-slate-400">Resultado Neto</span>
+                        <span id="pnl-badge" class="text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400">Rentable</span>
+                    </div>
                     <span id="pnl-ganancia-display" class="text-2xl font-black text-emerald-400">+0.00 USDT</span>
                     <span class="text-[9px] text-slate-400 block mt-0.5">Incluye deducción -5.6% Binance</span>
+                    <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-400 border-t border-slate-800/80 pt-2 mt-2">
+                        <div>Invertido: <b id="pnl-invertido-display" class="text-white">0.00</b></div>
+                        <div>Aterriza: <b id="pnl-retornados-display" class="text-white">0.00</b></div>
+                    </div>
                 </div>
 
                 <button onclick="guardarCicloArbitraje()" class="w-full bg-sky-500 font-bold py-3 rounded-xl text-slate-950 text-xs shadow-md">Archivar Ciclo en Firebase</button>
@@ -355,7 +358,31 @@
     </main>
 
     <!-- ============================================================ -->
-    <!-- BARRA DE NAVEGACIÓN INFERIOR (5 PESTAÑAS FINTECH)            -->
+    <!-- MODAL FLOTANTE DE DESGLOSE DE COMPRAS (DRILL-DOWN)           -->
+    <!-- ============================================================ -->
+    <div id="modal-desglose" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 id="modal-cat-nombre" class="text-base font-bold text-white">Categoría</h3>
+                    <p id="modal-cat-balance" class="text-xs text-slate-400">$0 / $0</p>
+                </div>
+                <button onclick="cerrarModalDesglose()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold active:scale-90 transition-all">✕</button>
+            </div>
+
+            <div class="border-t border-slate-800 pt-3">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Últimos Gastos Registrados</span>
+                <div id="modal-lista-compras" class="space-y-2 max-h-56 overflow-y-auto pr-1 text-xs hide-scrollbar"></div>
+            </div>
+
+            <button onclick="cerrarModalDesglose()" class="w-full bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-bold py-2.5 rounded-xl text-xs transition-all">
+                Cerrar Desglose
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- BARRA DE NAVEGACIÓN INFERIOR (5 PESTAÑAS)                    -->
     <!-- ============================================================ -->
     <nav class="fixed bottom-0 left-0 right-0 bg-[#090d16]/95 backdrop-blur border-t border-slate-800/90 px-2 py-2 flex justify-around items-center z-40">
         <button onclick="cambiarTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-sky-400">
@@ -381,52 +408,71 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-            // PLANTILLA BASE LIMPIA (Sin datos falsos de muestra)
+
+        // 1. ESTRUCTURA BASE DE DATOS
         let APP_DATA = {
-            patrimonio_total: 0.0, liquidez_libre: 0.0, tasa_bcv: 1.0, corte: "En vivo",
-            cuentas: [], otros_activos: [], deudores: { total: 0, lista: [] },
-            sinking_funds: {}, presupuesto_base: {},
-            meses_data: {
-                "2026-09": { gastado: 0.0, ingresos: 0.0, cats: {}, txs: [] }
-            },
-            mes_activo: "2026-09",
-            dia_actual: 1, dias_totales: 30,
+            patrimonio_total: 0.0,
+            liquidez_libre: 0.0,
+            tasa_bcv: 1.0,
+            corte: "Hoy",
+            cuentas: [],
+            otros_activos: [],
+            deudores: { total: 0.0, lista: [] },
+            presupuesto_base: {},
+            meses_data: {},
+            mes_activo: "",
+            dia_actual: 1,
+            dias_totales: 30,
             cfo_progreso: { cuota_bebe: 0, dias_bebe: 0, ahorro_bebe: 0, meta_bebe: 10000 }
         };
 
-        // LEER PAYLOAD DINÁMICO ENVIADO POR PYTHON DESDE EL URL (BASE64)
+        // 2. PARSEO DE DATOS DESDE EL URL (BASE64)
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const encoded = urlParams.get('data');
             if (encoded) {
-                APP_DATA = Object.assign(APP_DATA, JSON.parse(decodeURIComponent(escape(atob(encoded)))));
+                const decodedJson = decodeURIComponent(escape(atob(encoded)));
+                APP_DATA = Object.assign(APP_DATA, JSON.parse(decodedJson));
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Error decodificando payload URL:", e);
+        }
 
-        // Lista de meses disponibles ordenada
-        const mesesDisponibles = Object.keys(APP_DATA.meses_data).sort();
+        // 3. DETERMINACIÓN DE MESES DISPONIBLES
+        const mesesDisponibles = Object.keys(APP_DATA.meses_data || {}).sort();
         let indiceMesSeleccionado = mesesDisponibles.indexOf(APP_DATA.mes_activo);
-        if (indiceMesSeleccionado === -1) indiceMesSeleccionado = mesesDisponibles.length - 1;
+        if (indiceMesSeleccionado === -1) indiceMesSeleccionado = Math.max(0, mesesDisponibles.length - 1);
 
         const NOMBRES_MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
+        function cambiarMesRelativo(delta) {
+            const nuevoIndice = indiceMesSeleccionado + delta;
+            if (nuevoIndice >= 0 && nuevoIndice < mesesDisponibles.length) {
+                indiceMesSeleccionado = nuevoIndice;
+                actualizarVistasMes();
+                if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            }
+        }
+
         // ==========================================
-        // CONTROL DE NAVEGACIÓN ENTRE LAS 5 PESTAÑAS
+        // CONTROL DE NAVEGACIÓN ENTRE PESTAÑAS
         // ==========================================
         function cambiarTab(tabId) {
             ['dashboard', 'presupuesto', 'registro', 'movimientos', 'cfo-pro'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = 'flex flex-col items-center gap-1 text-slate-400';
+                const el = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (el) el.classList.add('hidden');
+                if (nav) nav.className = 'flex flex-col items-center gap-1 text-slate-400';
             });
-
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabId}`).className = 'flex flex-col items-center gap-1 text-sky-400';
-            
+            const selEl = document.getElementById(`tab-${tabId}`);
+            const selNav = document.getElementById(`nav-${tabId}`);
+            if (selEl) selEl.classList.remove('hidden');
+            if (selNav) selNav.className = 'flex flex-col items-center gap-1 text-sky-400';
             if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
         // ==========================================
-        // 1. INICIALIZAR PESTAÑA: INICIO
+        // 1. INICIALIZADOR: INICIO
         // ==========================================
         let simulandoCobro = false;
         function toggleSimularCobro() {
@@ -439,7 +485,7 @@
                 banner.classList.remove('hidden');
                 btn.className = "text-[11px] font-bold px-3 py-1.5 rounded-xl bg-emerald-500 text-slate-950 transition-all";
                 btn.innerText = "Simulando ✓";
-                const liqNueva = APP_DATA.liquidez_libre + APP_DATA.deudores.total;
+                const liqNueva = APP_DATA.liquidez_libre + (APP_DATA.deudores.total || 0);
                 document.getElementById('liquidez-simulada-display').innerText = `$${liqNueva.toFixed(2)}`;
                 liqDisp.innerText = `$${liqNueva.toFixed(2)}`;
                 liqDisp.className = "text-lg font-black text-emerald-400 tracking-tight";
@@ -458,330 +504,259 @@
             document.getElementById('liquidez-display').innerText = `$${APP_DATA.liquidez_libre.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
             document.getElementById('tasa-bcv-display').innerText = `${APP_DATA.tasa_bcv.toFixed(2)} Bs/$`;
             document.getElementById('subtitulo-corte').innerText = `Corte: ${APP_DATA.corte}`;
-            document.getElementById('total-deudores-display').innerText = `$${APP_DATA.deudores.total.toFixed(2)} USD`;
+            document.getElementById('total-deudores-display').innerText = `$${(APP_DATA.deudores.total || 0).toFixed(2)} USD`;
 
-            // Lista deudores
+            // Renderizar deudores
             const contDeudores = document.getElementById('lista-deudores-detalle');
-            contDeudores.innerHTML = '';
-            if (APP_DATA.deudores.lista && APP_DATA.deudores.lista.length > 0) {
-                APP_DATA.deudores.lista.forEach(d => {
-                    contDeudores.innerHTML += `
-                        <div class="flex justify-between text-slate-300 py-0.5">
-                            <span>👤 ${d.nombre}</span>
-                            <span class="font-bold text-emerald-400">+$${d.monto.toFixed(2)}</span>
-                        </div>
-                    `;
-                });
-            } else {
-                contDeudores.innerHTML = '<p class="text-slate-500 py-1">Nadie te debe dinero actualmente.</p>';
+            if (contDeudores) {
+                contDeudores.innerHTML = '';
+                if (APP_DATA.deudores.lista && APP_DATA.deudores.lista.length > 0) {
+                    APP_DATA.deudores.lista.forEach(d => {
+                        contDeudores.innerHTML += `
+                            <div class="flex justify-between text-slate-300 py-0.5">
+                                <span>👤 ${d.nombre}</span>
+                                <span class="font-bold text-emerald-400">+$${d.monto.toFixed(2)}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    contDeudores.innerHTML = '<p class="text-slate-500">Nadie te debe dinero actualmente.</p>';
+                }
             }
 
-            // Cuentas Bancarias y Otros Activos
+            // Renderizar cuentas bancarias y otros activos
             const contCuentas = document.getElementById('lista-cuentas-bancarias');
-            contCuentas.innerHTML = '';
-            if (APP_DATA.cuentas) {
-                APP_DATA.cuentas.forEach(c => {
-                    let s = '';
-                    if (c.bs && c.bs !== "0" && c.bs !== "0,00") s += `<span class="text-slate-300 block">Bs. ${c.bs}</span>`;
-                    if (c.usd && c.usd !== "0" && c.usd !== "0,00") s += `<span class="text-emerald-400 font-bold block">$ ${c.usd}</span>`;
-                    contCuentas.innerHTML += `
-                        <div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-800/40 border border-slate-700/40">
-                            <div>
-                                <span class="font-bold text-white block">${c.banco}</span>
-                                <span class="text-[10px] text-slate-400">${c.nombre}</span>
+            if (contCuentas) {
+                contCuentas.innerHTML = '';
+                if (APP_DATA.cuentas && APP_DATA.cuentas.length > 0) {
+                    APP_DATA.cuentas.forEach(c => {
+                        let saldosHtml = '';
+                        if (c.bs && c.bs !== "0" && c.bs !== "0,00") saldosHtml += `<span class="text-slate-300 block">Bs. ${c.bs}</span>`;
+                        if (c.usd && c.usd !== "0" && c.usd !== "0,00") saldosHtml += `<span class="text-emerald-400 font-bold block">$ ${c.usd}</span>`;
+                        contCuentas.innerHTML += `
+                            <div class="flex justify-between items-center p-2 rounded-xl bg-slate-800/40 border border-slate-700/40">
+                                <div>
+                                    <span class="font-bold text-white block">${c.banco}</span>
+                                    <span class="text-[10px] text-slate-400">${c.nombre}</span>
+                                </div>
+                                <div class="text-right text-[11px]">${saldosHtml || '<span class="text-slate-500">$0.00</span>'}</div>
                             </div>
-                            <div class="text-right text-[11px]">${s || '<span class="text-slate-500">$0.00</span>'}</div>
-                        </div>
-                    `;
-                });
-            }
-            if (APP_DATA.otros_activos) {
-                APP_DATA.otros_activos.forEach(a => {
-                    contCuentas.innerHTML += `
-                        <div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-800/20 border border-slate-700/30">
-                            <div>
-                                <span class="font-bold text-slate-200 block">💼 ${a.descripcion}</span>
-                                <span class="text-[10px] text-slate-500">Efectivo / Billetera</span>
+                        `;
+                    });
+                }
+                if (APP_DATA.otros_activos && APP_DATA.otros_activos.length > 0) {
+                    APP_DATA.otros_activos.forEach(a => {
+                        contCuentas.innerHTML += `
+                            <div class="flex justify-between items-center p-2 rounded-xl bg-slate-800/20 border border-slate-700/30">
+                                <div>
+                                    <span class="font-bold text-slate-200 block">💼 ${a.descripcion}</span>
+                                    <span class="text-[10px] text-slate-500">Efectivo / Billetera</span>
+                                </div>
+                                <div class="text-right text-[11px] font-bold text-sky-400">$ ${parseFloat(a.monto).toFixed(2)}</div>
                             </div>
-                            <div class="text-right text-[11px] font-bold text-sky-400">$ ${parseFloat(a.monto).toFixed(2)}</div>
-                        </div>
-                    `;
-                });
+                        `;
+                    });
+                }
             }
         }
 
         // ==========================================
-        // 2. INICIALIZAR PESTAÑA: PRESUPUESTO & TORTA
+        // 2. INICIALIZADOR: PRESUPUESTO & TORTA
         // ==========================================
         let chartInstancia = null;
         let vistaGraficoActual = 'flujo';
 
-        function cambiarMesRelativo(delta) {
-            const nuevoIndice = indiceMesSeleccionado + delta;
-            if (nuevoIndice >= 0 && nuevoIndice < mesesDisponibles.length) {
-                indiceMesSeleccionado = nuevoIndice;
-                actualizarVistasMes();
-                if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        function cambiarVistaGrafico(tipo) {
+            vistaGraficoActual = tipo;
+            const btnF = document.getElementById('btn-chart-flujo');
+            const btnC = document.getElementById('btn-chart-cats');
+            const tit = document.getElementById('titulo-grafico');
+
+            if (btnF && btnC) {
+                btnF.className = tipo === 'flujo' ? "px-2.5 py-1 rounded-md bg-sky-500 text-slate-950 transition-all" : "px-2.5 py-1 rounded-md text-slate-400 transition-all";
+                btnC.className = tipo === 'categorias' ? "px-2.5 py-1 rounded-md bg-sky-500 text-slate-950 transition-all" : "px-2.5 py-1 rounded-md text-slate-400 transition-all";
             }
+            if (tit) tit.innerText = tipo === 'flujo' ? "Flujo Mensual" : "Gastos por Categoría";
+            actualizarVistasMes();
         }
 
         function actualizarVistasMes() {
-            const mesClave = mesesDisponibles[indiceMesSeleccionado]; // Ej: "2026-09"
-            const [anio, mesNum] = mesClave.split("-");
-            const nombreMes = NOMBRES_MESES[parseInt(mesNum) - 1];
+            if (mesesDisponibles.length === 0) return;
 
-            // 1. Actualizar selector superior
-            document.getElementById('mes-activo-label').innerText = `${nombreMes} ${anio}`;
-            const esMesActual = (mesClave === APP_DATA.mes_activo);
-            document.getElementById('mes-subtitulo-status').innerText = esMesActual ? "Mes en curso" : "Histórico cerrado";
-            document.getElementById('mes-subtitulo-status').className = esMesActual ? "text-[9px] text-sky-400 font-semibold block" : "text-[9px] text-amber-400 font-semibold block";
+            const mesClave = mesesDisponibles[indiceMesSeleccionado];
+            const parts = mesClave.split("-");
+            const anio = parts[0];
+            const mesNum = parseInt(parts[1]);
+            const nombreMes = NOMBRES_MESES[mesNum - 1] || "Mes";
 
-            // Deshabilitar botones si llegamos a los extremos
-            document.getElementById('btn-mes-anterior').disabled = (indiceMesSeleccionado === 0);
-            document.getElementById('btn-mes-anterior').style.opacity = (indiceMesSeleccionado === 0) ? "0.3" : "1";
-            
-            document.getElementById('btn-mes-siguiente').disabled = (indiceMesSeleccionado === mesesDisponibles.length - 1);
-            document.getElementById('btn-mes-siguiente').style.opacity = (indiceMesSeleccionado === mesesDisponibles.length - 1) ? "0.3" : "1";
+            const lblMes = document.getElementById('mes-activo-label');
+            if (lblMes) lblMes.innerText = `${nombreMes} ${anio}`;
 
-            // 2. Extraer data del mes seleccionado
+            const subMes = document.getElementById('mes-subtitulo-status');
+            const esActual = (mesClave === APP_DATA.mes_activo);
+            if (subMes) {
+                subMes.innerText = esActual ? "Mes en curso" : "Histórico cerrado";
+                subMes.className = esActual ? "text-[9px] text-sky-400 font-bold block" : "text-[9px] text-amber-400 font-bold block";
+            }
+
+            // Deshabilitar flechas en los bordes
+            const btnAnt = document.getElementById('btn-mes-anterior');
+            const btnSig = document.getElementById('btn-mes-siguiente');
+            if (btnAnt) {
+                btnAnt.disabled = (indiceMesSeleccionado === 0);
+                btnAnt.style.opacity = (indiceMesSeleccionado === 0) ? "0.3" : "1";
+            }
+            if (btnSig) {
+                btnSig.disabled = (indiceMesSeleccionado === mesesDisponibles.length - 1);
+                btnSig.style.opacity = (indiceMesSeleccionado === mesesDisponibles.length - 1) ? "0.3" : "1";
+            }
+
             const dataMes = APP_DATA.meses_data[mesClave] || { gastado: 0, ingresos: 0, cats: {}, txs: [] };
 
-            // 3. Actualizar Presupuesto y Stats
-            const costoVida = Object.values(APP_DATA.presupuesto_base).reduce((a, b) => a + b, 0);
+            const costoVida = Object.values(APP_DATA.presupuesto_base || {}).reduce((a, b) => a + b, 0);
             const ahorroExigido = Math.max(0, dataMes.ingresos - costoVida);
 
-            document.getElementById('stat-ingresos-display').innerText = `$${Math.round(dataMes.ingresos)}`;
-            document.getElementById('stat-gastado-display').innerText = `$${Math.round(dataMes.gastado)}`;
-            document.getElementById('stat-ahorro-display').innerText = `$${Math.round(ahorroExigido)}`;
+            const statIng = document.getElementById('stat-ingresos-display');
+            const statGas = document.getElementById('stat-gastado-display');
+            const statAho = document.getElementById('stat-ahorro-display');
+            if (statIng) statIng.innerText = `$${Math.round(dataMes.ingresos)}`;
+            if (statGas) statGas.innerText = `$${Math.round(dataMes.gastado)}`;
+            if (statAho) statAho.innerText = `$${Math.round(ahorroExigido)}`;
 
-            // 4. Redibujar Barras de Presupuesto para ese mes
+            // Renderizar barras de presupuesto
             const contBarras = document.getElementById('lista-barras-presupuesto');
-            contBarras.innerHTML = '';
+            if (contBarras) {
+                contBarras.innerHTML = '';
+                for (const [cat, limite] of Object.entries(APP_DATA.presupuesto_base || {})) {
+                    const gastado = dataMes.cats[cat] || 0;
+                    const pct = limite > 0 ? Math.min(100, Math.round((gastado / limite) * 100)) : 100;
+                    const color = pct >= 100 ? 'bg-rose-500' : pct > 75 ? 'bg-amber-500' : 'bg-sky-500';
 
-            for (const [cat, limite] of Object.entries(APP_DATA.presupuesto_base)) {
-                const gastado = dataMes.cats[cat] || 0;
-                const pct = limite > 0 ? Math.min(100, Math.round((gastado / limite) * 100)) : 100;
-                const color = pct >= 100 ? 'bg-rose-500' : pct > 75 ? 'bg-amber-500' : 'bg-sky-500';
-
-                contBarras.innerHTML += `
-                    <div onclick="irAMovimientosFiltrados('${cat}')" class="cursor-pointer active:opacity-75 transition-all p-2 rounded-xl hover:bg-slate-800/40">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="font-medium text-slate-200">${cat}</span>
-                            <span class="font-bold text-slate-300">$${gastado} / $${limite} (${pct}%)</span>
-                        </div>
-                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                            <div class="${color} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // 5. Redibujar Donut Chart
-            renderizarDonutChartMes(dataMes, ahorroExigido);
-
-            // 6. Actualizar Feed de Movimientos para ese mes
-            actualizarMovimientosMes(dataMes.txs);
-        }
-        
-            if (vistaGraficoActual === 'flujo') {
-                chartInstancia = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Gastado', 'Ahorro Seguro', 'Libre'],
-                        datasets: [{
-                            data: [
-                                dataMes.gastado,
-                                Math.min(ahorroExigido, Math.max(0, dataMes.ingresos - dataMes.gastado)),
-                                Math.max(0, dataMes.ingresos - dataMes.gastado - ahorroExigido)
-                            ],
-                            backgroundColor: ['#f43f5e', '#0284c7', '#10b981'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, color: '#94a3b8', font: { size: 9 } } } } }
-                });
-            } else {
-                const labels = Object.keys(dataMes.cats);
-                const dataVals = Object.values(dataMes.cats);
-                const colores = ['#f43f5e', '#fb923c', '#facc15', '#4ade80', '#2dd4bf', '#38bdf8', '#818cf8', '#c084fc', '#f472b6', '#94a3b8', '#cbd5e1'];
-
-                chartInstancia = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels.length > 0 ? labels : ['Sin Gastos'],
-                        datasets: [{
-                            data: dataVals.length > 0 ? dataVals : [1],
-                            backgroundColor: colores.slice(0, Math.max(1, labels.length)),
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, color: '#94a3b8', font: { size: 9 } } } } }
-                });
-            }
-        
-
-        function actualizarMovimientosMes(transaccionesMes) {
-            // Actualizar selector de filtro
-            const selectFiltro = document.getElementById('filtro-categoria-movs');
-            selectFiltro.innerHTML = '<option value="TODAS">📁 Todas las categorías</option>';
-
-            const categoriasUnicas = new Set();
-            transaccionesMes.forEach(t => categoriasUnicas.add(t[2]));
-            categoriasUnicas.forEach(cat => selectFiltro.innerHTML += `<option value="${cat}">${cat}</option>`);
-
-            gastosSeleccionados.clear();
-            actualizarBarraLote();
-
-            // Pintar transacciones
-            const cont = document.getElementById('lista-movimientos-completa');
-            cont.innerHTML = '';
-            document.getElementById('contador-transacciones').innerText = `${transaccionesMes.length} gastos`;
-
-            if (transaccionesMes.length === 0) {
-                cont.innerHTML = '<p class="text-slate-500 text-center py-8 text-xs">No hay gastos registrados en este mes.</p>';
-                return;
-            }
-
-            transaccionesMes.forEach(t => {
-                const [id, fecha, cat, concepto, monto] = t;
-                cont.innerHTML += `
-                    <div id="item-tx-${id}" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md">
-                        <input type="checkbox" onchange="toggleSeleccionGasto('${id}')" class="w-4 h-4 accent-rose-500 rounded cursor-pointer">
-                        <div class="flex-1 truncate">
-                            <span class="font-bold text-white text-xs block truncate">${concepto}</span>
-                            <div class="flex items-center gap-2 mt-0.5">
-                                <span class="text-[10px] text-slate-400">${fecha}</span>
-                                <span class="text-[9px] bg-slate-800 text-sky-400 px-2 py-0.5 rounded-full border border-slate-700/60 font-medium">${cat}</span>
+                    contBarras.innerHTML += `
+                        <div onclick="abrirDesglose('${cat}')" class="p-1.5 rounded-xl bg-slate-800/20 active:opacity-75 cursor-pointer transition-all hover:bg-slate-800/40">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="font-medium text-slate-200">${cat}</span>
+                                <span class="font-bold text-slate-300">$${gastado} / $${limite} (${pct}%)</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="${color} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-black text-xs text-rose-400">-$${monto.toFixed(2)}</span>
-                            <button onclick="eliminarGastoDirecto('${id}', '${concepto}', ${monto})" class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center text-xs active:scale-90 transition-all">
-                                🗑️
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function cambiarVistaGrafico(tipo) {
-            vistaGraficoActual = tipo;
-            const btnFlujo = document.getElementById('btn-chart-flujo');
-            const btnCats = document.getElementById('btn-chart-cats');
-            const titulo = document.getElementById('titulo-grafico');
-
-            if (tipo === 'flujo') {
-                btnFlujo.className = "px-2.5 py-1 rounded-md bg-sky-500 text-slate-950 transition-all";
-                btnCats.className = "px-2.5 py-1 rounded-md text-slate-400 transition-all";
-                titulo.innerText = "Flujo Mensual";
-            } else {
-                btnCats.className = "px-2.5 py-1 rounded-md bg-sky-500 text-slate-950 transition-all";
-                btnFlujo.className = "px-2.5 py-1 rounded-md text-slate-400 transition-all";
-                titulo.innerText = "Gastos por Categoría";
+                    `;
+                }
             }
-            renderizarDonutChart();
-            if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
-        }
 
-        function renderizarDonutChart() {
+            // Renderizar Donut Chart
             const canvas = document.getElementById('donutChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                if (chartInstancia) chartInstancia.destroy();
 
-            if (chartInstancia) chartInstancia.destroy();
+                if (vistaGraficoActual === 'flujo') {
+                    chartInstancia = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Gastado', 'Ahorro Seguro', 'Libre'],
+                            datasets: [{
+                                data: [
+                                    dataMes.gastado,
+                                    Math.min(ahorroExigido, Math.max(0, dataMes.ingresos - dataMes.gastado)),
+                                    Math.max(0, dataMes.ingresos - dataMes.gastado - ahorroExigido)
+                                ],
+                                backgroundColor: ['#f43f5e', '#0284c7', '#10b981'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, color: '#94a3b8', font: { size: 9 } } } } }
+                    });
+                } else {
+                    const labels = Object.keys(dataMes.cats);
+                    const dataVals = Object.values(dataMes.cats);
+                    const colores = ['#f43f5e', '#fb923c', '#facc15', '#4ade80', '#2dd4bf', '#38bdf8', '#818cf8', '#c084fc', '#f472b6', '#94a3b8'];
 
-            if (vistaGraficoActual === 'flujo') {
-                chartInstancia = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Gastado', 'Ahorro Seguro', 'Libre'],
-                        datasets: [{
-                            data: [
-                                APP_DATA.gastado_mes,
-                                Math.min(APP_DATA.ahorro_exigido, Math.max(0, APP_DATA.ingresos_mes - APP_DATA.gastado_mes)),
-                                Math.max(0, APP_DATA.ingresos_mes - APP_DATA.gastado_mes - APP_DATA.ahorro_exigido)
-                            ],
-                            backgroundColor: ['#f43f5e', '#0284c7', '#10b981'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, color: '#94a3b8', font: { size: 9 } } } } }
+                    chartInstancia = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels.length > 0 ? labels : ['Sin Gastos'],
+                            datasets: [{
+                                data: dataVals.length > 0 ? dataVals : [1],
+                                backgroundColor: colores.slice(0, Math.max(1, labels.length)),
+                                borderWidth: 0
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, color: '#94a3b8', font: { size: 9 } } } } }
+                    });
+                }
+            }
+
+            // Actualizar feed de movimientos para el mes seleccionado
+            actualizarFeedMovimientosMes(dataMes.txs || []);
+        }
+
+        // ==========================================
+        // 3. MODAL DESGLOSE TÁCTIL (DRILL-DOWN)
+        // ==========================================
+        function abrirDesglose(catNombre) {
+            const mesClave = mesesDisponibles[indiceMesSeleccionado];
+            const dataMes = APP_DATA.meses_data[mesClave] || { cats: {}, txs: [] };
+            const gastado = dataMes.cats[catNombre] || 0;
+            const limite = (APP_DATA.presupuesto_base && APP_DATA.presupuesto_base[catNombre]) || 0;
+
+            document.getElementById('modal-cat-nombre').innerText = catNombre;
+            document.getElementById('modal-cat-balance').innerText = `Total: $${gastado.toFixed(2)} ${limite > 0 ? '/ Límite: $' + limite : ''}`;
+
+            const cont = document.getElementById('modal-lista-compras');
+            cont.innerHTML = '';
+
+            const txsFiltradas = (dataMes.txs || []).filter(t => t[2].toLowerCase() === catNombre.toLowerCase());
+
+            if (txsFiltradas.length > 0) {
+                txsFiltradas.forEach(t => {
+                    const id = t[0];
+                    const fecha = t[1];
+                    const concepto = t[3];
+                    const monto = t[4];
+
+                    cont.innerHTML += `
+                        <div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/40">
+                            <div class="pr-2 truncate max-w-[200px]">
+                                <span class="font-bold text-white block truncate">${concepto}</span>
+                                <span class="text-[10px] text-slate-400">${fecha}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-rose-400">-$${monto.toFixed(2)}</span>
+                                <button onclick="eliminarGastoDirecto('${id}', '${concepto}', ${monto})" class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-xs active:scale-90 transition-all">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    `;
                 });
             } else {
-                const labels = Object.keys(APP_DATA.gastos_por_categoria);
-                const dataVals = Object.values(APP_DATA.gastos_por_categoria);
-                const colores = ['#f43f5e', '#fb923c', '#facc15', '#4ade80', '#2dd4bf', '#38bdf8', '#818cf8', '#c084fc', '#f472b6', '#94a3b8', '#cbd5e1'];
-
-                chartInstancia = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels.length > 0 ? labels : ['Sin Gastos'],
-                        datasets: [{
-                            data: dataVals.length > 0 ? dataVals : [1],
-                            backgroundColor: colores.slice(0, Math.max(1, labels.length)),
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, color: '#94a3b8', font: { size: 9 } } } } }
-                });
-            }
-        }
-
-        function inicializarPresupuesto() {
-            document.getElementById('stat-ingresos-display').innerText = `$${Math.round(APP_DATA.ingresos_mes)}`;
-            document.getElementById('stat-gastado-display').innerText = `$${Math.round(APP_DATA.gastado_mes)}`;
-            document.getElementById('stat-ahorro-display').innerText = `$${Math.round(APP_DATA.ahorro_exigido)}`;
-            document.getElementById('porcentaje-mes-display').innerText = `Día ${APP_DATA.dia_actual} de ${APP_DATA.dias_totales}`;
-
-            const contBarras = document.getElementById('lista-barras-presupuesto');
-            contBarras.innerHTML = '';
-            for (const [cat, info] of Object.entries(APP_DATA.presupuesto)) {
-                const limite = info.limite || 0;
-                const pct = limite > 0 ? Math.min(100, Math.round((info.gastado / limite) * 100)) : 100;
-                const color = limite === 0 ? 'bg-amber-500' : pct >= 100 ? 'bg-rose-500' : pct > 75 ? 'bg-amber-500' : 'bg-sky-500';
-
-                contBarras.innerHTML += `
-                    <div onclick="irAMovimientosFiltrados('${cat}')" class="cursor-pointer active:opacity-75 transition-all p-2 rounded-xl hover:bg-slate-800/40">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="font-medium text-slate-200">${cat}</span>
-                            <span class="font-bold text-slate-300">$${info.gastado} ${limite > 0 ? '/ $' + limite + ' (' + pct + '%)' : '(Sin límite)'}</span>
-                        </div>
-                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                            <div class="${color} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
-                        </div>
-                    </div>
-                `;
+                cont.innerHTML = '<p class="text-slate-500 text-center py-4">No hay compras detalladas registradas en esta categoría para este mes.</p>';
             }
 
-            renderizarDonutChart();
+            document.getElementById('modal-desglose').classList.remove('hidden');
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // Lleva directo de una barra de presupuesto a la pestaña de auditoría filtrada
-        function irAMovimientosFiltrados(catNombre) {
-            cambiarTab('movimientos');
-            document.getElementById('filtro-categoria-movs').value = catNombre;
-            filtrarMovimientos();
+        function cerrarModalDesglose() {
+            document.getElementById('modal-desglose').classList.add('hidden');
         }
 
         // ==========================================
-        // 3. INICIALIZAR PESTAÑA: MOVIMIENTOS & BORRADO
-        // ==========================================
-        // ==========================================
-        // GESTOR DE MOVIMIENTOS CON SELECCIÓN MÚLTIPLE
+        // 4. INICIALIZADOR: MOVIMIENTOS & BORRADO
         // ==========================================
         let gastosSeleccionados = new Set();
 
-        function inicializarMovimientos() {
+        function actualizarFeedMovimientosMes(transaccionesMes) {
             const selectFiltro = document.getElementById('filtro-categoria-movs');
-            selectFiltro.innerHTML = '<option value="TODAS">📁 Todas las categorías</option>';
-
-            const categoriasUnicas = new Set();
-            APP_DATA.transacciones.forEach(t => categoriasUnicas.add(t[2]));
-
-            categoriasUnicas.forEach(cat => {
-                selectFiltro.innerHTML += `<option value="${cat}">${cat}</option>`;
-            });
+            if (selectFiltro) {
+                selectFiltro.innerHTML = '<option value="TODAS">📁 Todas las categorías</option>';
+                const catsUnicas = new Set();
+                transaccionesMes.forEach(t => catsUnicas.add(t[2]));
+                catsUnicas.forEach(cat => selectFiltro.innerHTML += `<option value="${cat}">${cat}</option>`);
+            }
 
             gastosSeleccionados.clear();
             actualizarBarraLote();
@@ -803,41 +778,41 @@
             const txt = document.getElementById('txt-seleccionados');
             const total = gastosSeleccionados.size;
 
-            if (total > 0) {
-                barra.classList.remove('hidden');
-                txt.innerText = `${total} gasto(s) seleccionado(s)`;
-            } else {
-                barra.classList.add('hidden');
+            if (barra && txt) {
+                if (total > 0) {
+                    barra.classList.remove('hidden');
+                    txt.innerText = `${total} gasto(s) seleccionado(s)`;
+                } else {
+                    barra.classList.add('hidden');
+                }
             }
         }
 
         function filtrarMovimientos() {
-            const busqueda = document.getElementById('buscador-movimientos').value.toLowerCase();
-            const catFiltro = document.getElementById('filtro-categoria-movs').value;
+            const mesClave = mesesDisponibles[indiceMesSeleccionado];
+            const dataMes = APP_DATA.meses_data[mesClave] || { txs: [] };
+            const transaccionesMes = dataMes.txs || [];
+
+            const busqueda = (document.getElementById('buscador-movimientos') ? document.getElementById('buscador-movimientos').value.toLowerCase() : "");
+            const catFiltro = (document.getElementById('filtro-categoria-movs') ? document.getElementById('filtro-categoria-movs').value : "TODAS");
             const cont = document.getElementById('lista-movimientos-completa');
+            if (!cont) return;
             cont.innerHTML = '';
 
             let contador = 0;
 
-            APP_DATA.transacciones.forEach(t => {
-                const id = t[0];
-                const fecha = t[1];
-                const cat = t[2];
-                const concepto = t[3];
-                const monto = t[4];
-
+            transaccionesMes.forEach(t => {
+                const [id, fecha, cat, concepto, monto] = t;
                 const coincideTexto = concepto.toLowerCase().includes(busqueda) || cat.toLowerCase().includes(busqueda);
                 const coincideCat = (catFiltro === "TODAS" || cat === catFiltro);
 
                 if (coincideTexto && coincideCat) {
                     contador++;
                     const checked = gastosSeleccionados.has(id) ? 'checked' : '';
-                    
+
                     cont.innerHTML += `
                         <div id="item-tx-${id}" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md">
-                            <!-- CHECKBOX DE SELECCIÓN MÚLTIPLE -->
                             <input type="checkbox" onchange="toggleSeleccionGasto('${id}')" ${checked} class="w-4 h-4 accent-rose-500 rounded cursor-pointer">
-                            
                             <div class="flex-1 truncate">
                                 <span class="font-bold text-white text-xs block truncate">${concepto}</span>
                                 <div class="flex items-center gap-2 mt-0.5">
@@ -845,7 +820,6 @@
                                     <span class="text-[9px] bg-slate-800 text-sky-400 px-2 py-0.5 rounded-full border border-slate-700/60 font-medium">${cat}</span>
                                 </div>
                             </div>
-                            
                             <div class="flex items-center gap-2">
                                 <span class="font-black text-xs text-rose-400">-$${monto.toFixed(2)}</span>
                                 <button onclick="eliminarGastoDirecto('${id}', '${concepto}', ${monto})" class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center text-xs active:scale-90 transition-all">
@@ -857,14 +831,16 @@
                 }
             });
 
-            document.getElementById('contador-transacciones').innerText = `${contador} gastos`;
+            const cntLbl = document.getElementById('contador-transacciones');
+            if (cntLbl) cntLbl.innerText = `${contador} gastos`;
+
             if (contador === 0) {
                 cont.innerHTML = '<p class="text-slate-500 text-center py-8 text-xs">No se encontraron movimientos con los filtros aplicados.</p>';
             }
         }
 
         function eliminarGastoDirecto(id, concepto, monto) {
-            if (!confirm(`¿Eliminar este gasto de $${monto}?\n(${concepto})`)) return;
+            if (!confirm(`¿Eliminar definitivamente este gasto de $${monto}?\n(${concepto})`)) return;
 
             const payload = {
                 tipo_evento: "eliminar_gasto",
@@ -893,45 +869,58 @@
         }
 
         // ==========================================
-        // 4. INICIALIZAR PESTAÑA: CFO PRO
+        // 5. INICIALIZADOR: CFO PRO
         // ==========================================
         function inicializarCFOPro() {
-            // Bebé
+            // Meta Bebé
             const cfo = APP_DATA.cfo_progreso;
-            document.getElementById('cfo-dias-bebe').innerText = `Faltan ${cfo.dias_bebe} días`;
-            document.getElementById('cfo-ahorro-bebe').innerText = `$${cfo.ahorro_bebe.toLocaleString()}`;
-            document.getElementById('cfo-cuota-bebe').innerText = `$${cfo.cuota_bebe.toFixed(0)}/mes`;
-            document.getElementById('cfo-barra-bebe').style.width = `${Math.min(100, Math.round((cfo.ahorro_bebe / cfo.meta_bebe) * 100))}%`;
+            if (cfo) {
+                const diasLbl = document.getElementById('cfo-dias-bebe');
+                const ahoLbl = document.getElementById('cfo-ahorro-bebe');
+                const cuoLbl = document.getElementById('cfo-cuota-bebe');
+                const barEl = document.getElementById('cfo-barra-bebe');
+
+                if (diasLbl) diasLbl.innerText = `Faltan ${cfo.dias_bebe} días`;
+                if (ahoLbl) ahoLbl.innerText = `$${(cfo.ahorro_bebe || 0).toLocaleString()}`;
+                if (cuoLbl) cuoLbl.innerText = `$${(cfo.cuota_bebe || 0).toFixed(0)}/mes`;
+                const pctBebe = Math.min(100, Math.round(((cfo.ahorro_bebe || 0) / (cfo.meta_bebe || 10000)) * 100));
+                if (barEl) barEl.style.width = `${pctBebe}%`;
+            }
 
             // Sobres
             const contSobres = document.getElementById('contenedor-sobres');
-            contSobres.innerHTML = '';
-            for (const [nombre, info] of Object.entries(APP_DATA.sinking_funds)) {
-                const pct = Math.min(100, Math.round((info.actual / info.meta) * 100));
-                contSobres.innerHTML += `
-                    <div class="bg-slate-800/40 border border-slate-700/50 p-3.5 rounded-xl">
-                        <div class="flex justify-between items-start mb-1.5">
-                            <h4 class="font-bold text-xs text-white">${nombre}</h4>
-                            <span class="text-xs font-black text-sky-400">${pct}%</span>
+            if (contSobres) {
+                contSobres.innerHTML = '';
+                for (const [nombre, info] of Object.entries(APP_DATA.sinking_funds || {})) {
+                    const pct = Math.min(100, Math.round((info.actual / info.meta) * 100));
+                    contSobres.innerHTML += `
+                        <div class="bg-slate-800/40 border border-slate-700/50 p-3.5 rounded-xl">
+                            <div class="flex justify-between items-start mb-1.5">
+                                <h4 class="font-bold text-xs text-white">${nombre}</h4>
+                                <span class="text-xs font-black text-sky-400">${pct}%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-1.5">
+                                <div class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-400">
+                                <span>Ahorrado: $${info.actual.toLocaleString()}</span>
+                                <span>Meta: $${info.meta.toLocaleString()}</span>
+                            </div>
                         </div>
-                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-1.5">
-                            <div class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full rounded-full" style="width: ${pct}%"></div>
-                        </div>
-                        <div class="flex justify-between text-[10px] text-slate-400">
-                            <span>Ahorrado: $${info.actual.toLocaleString()}</span>
-                            <span>Meta: $${info.meta.toLocaleString()}</span>
-                        </div>
-                    </div>
-                `;
+                    `;
+                }
             }
 
             actualizarSimulador(100);
             calcularPnLLive();
         }
 
+        // Simulador de Impacto
         function actualizarSimulador(val) {
-            document.getElementById('simulador-input').value = val;
-            document.getElementById('simulador-slider').value = val;
+            const inp = document.getElementById('simulador-input');
+            const sld = document.getElementById('simulador-slider');
+            if (inp) inp.value = val;
+            if (sld) sld.value = val;
 
             const gasto = parseFloat(val) || 0;
             const remanente = APP_DATA.liquidez_libre - gasto;
@@ -942,23 +931,26 @@
             const desc = document.getElementById('simulador-desc');
             const remTxt = document.getElementById('simulador-remanente');
 
-            remTxt.innerText = `$${remanente.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            if (remTxt) remTxt.innerText = `$${remanente.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-            if (remanente >= 0) {
-                card.className = "border border-emerald-500/30 bg-emerald-500/10 p-3.5 rounded-2xl transition-all";
-                icono.innerText = "🟢";
-                titulo.className = "font-bold text-xs text-emerald-400";
-                titulo.innerText = "Luz Verde: Gasto Seguro";
-                desc.innerText = "Tu flujo cubre este consumo sin comprometer tu fondo operativo ni el aporte a la bebé.";
-            } else {
-                card.className = "border border-rose-500/30 bg-rose-500/10 p-3.5 rounded-2xl transition-all";
-                icono.innerText = "🔴";
-                titulo.className = "font-bold text-xs text-rose-400";
-                titulo.innerText = "Alerta Roja: Compromete Metas";
-                desc.innerText = `Este gasto causará un déficit de $${Math.abs(remanente).toFixed(2)}. Estarías tocando dinero intocable de tus metas.`;
+            if (card && icono && titulo && desc) {
+                if (remanente >= 0) {
+                    card.className = "border border-emerald-500/30 bg-emerald-500/10 p-3.5 rounded-2xl transition-all";
+                    icono.innerText = "🟢";
+                    titulo.className = "font-bold text-xs text-emerald-400";
+                    titulo.innerText = "Luz Verde: Gasto Seguro";
+                    desc.innerText = "Tu flujo cubre este consumo sin comprometer tu fondo operativo ni el aporte a la bebé.";
+                } else {
+                    card.className = "border border-rose-500/30 bg-rose-500/10 p-3.5 rounded-2xl transition-all";
+                    icono.innerText = "🔴";
+                    titulo.className = "font-bold text-xs text-rose-400";
+                    titulo.innerText = "Alerta Roja: Compromete Metas";
+                    desc.innerText = `Este gasto causará un déficit de $${Math.abs(remanente).toFixed(2)}. Estarías tocando dinero sagrado de tus metas.`;
+                }
             }
         }
 
+        // Calculadora P&L
         let tipoPnLActual = 'comercial';
         let pnlCalculoGlobal = { ganancia: 0, invertidos: 0, retornados: 0, usdBanco: 0 };
 
@@ -970,30 +962,36 @@
             const secNom = document.getElementById('pnl-campos-nomina');
 
             if (tipo === 'comercial') {
-                btnCom.className = "py-1.5 text-xs font-bold rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30";
-                btnNom.className = "py-1.5 text-xs font-bold rounded-lg text-slate-400";
-                secCom.classList.remove('hidden');
-                secNom.classList.add('hidden');
+                if (btnCom) btnCom.className = "py-1.5 text-xs font-bold rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30";
+                if (btnNom) btnNom.className = "py-1.5 text-xs font-bold rounded-lg text-slate-400";
+                if (secCom) secCom.classList.remove('hidden');
+                if (secNom) secNom.classList.add('hidden');
             } else {
-                btnNom.className = "py-1.5 text-xs font-bold rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30";
-                btnCom.className = "py-1.5 text-xs font-bold rounded-lg text-slate-400";
-                secNom.classList.remove('hidden');
-                secCom.classList.add('hidden');
+                if (btnNom) btnNom.className = "py-1.5 text-xs font-bold rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30";
+                if (btnCom) btnCom.className = "py-1.5 text-xs font-bold rounded-lg text-slate-400";
+                if (secNom) secNom.classList.remove('hidden');
+                if (secCom) secCom.classList.add('hidden');
             }
             calcularPnLLive();
         }
 
         function calcularPnLLive() {
-            const usdBanco = parseFloat(document.getElementById('pnl-usd-banco').value) || 0;
-            const multBanco = parseFloat(document.getElementById('pnl-metodo').value) || 1.005;
+            const elUsd = document.getElementById('pnl-usd-banco');
+            const elMet = document.getElementById('pnl-metodo');
+            if (!elUsd || !elMet) return;
+
+            const usdBanco = parseFloat(elUsd.value) || 0;
+            const multBanco = parseFloat(elMet.value) || 1.005;
             const tasaBCV = APP_DATA.tasa_bcv || 848.55;
 
             let usdtInvertidos = 0;
             const usdtRetornados = usdBanco * (1 - 0.056);
 
             if (tipoPnLActual === 'comercial') {
-                const tasaP2P = parseFloat(document.getElementById('pnl-tasa-p2p').value) || (tasaBCV * 1.12);
-                const pagoMovil = document.getElementById('pnl-pago-movil').checked;
+                const elP2P = document.getElementById('pnl-tasa-p2p');
+                const elPM = document.getElementById('pnl-pago-movil');
+                const tasaP2P = (elP2P && parseFloat(elP2P.value)) || (tasaBCV * 1.12);
+                const pagoMovil = elPM ? elPM.checked : false;
 
                 const costoUsdBs = usdBanco * tasaBCV * multBanco;
                 const comisionPM = pagoMovil ? (costoUsdBs * 0.003) : 0;
@@ -1001,7 +999,8 @@
 
                 usdtInvertidos = costoTotalBs / tasaP2P;
             } else {
-                const tasaNomina = parseFloat(document.getElementById('pnl-tasa-nomina').value) || tasaBCV;
+                const elNom = document.getElementById('pnl-tasa-nomina');
+                const tasaNomina = (elNom && parseFloat(elNom.value)) || tasaBCV;
                 const costoBsTotal = usdBanco * tasaBCV * multBanco;
                 usdtInvertidos = costoBsTotal / tasaNomina;
             }
@@ -1016,16 +1015,28 @@
             };
 
             const card = document.getElementById('pnl-card-resultado');
+            const badge = document.getElementById('pnl-badge');
             const dispGanancia = document.getElementById('pnl-ganancia-display');
+            const dispInv = document.getElementById('pnl-invertido-display');
+            const dispRet = document.getElementById('pnl-retornados-display');
 
-            if (ganancia >= 0) {
-                card.className = "border border-emerald-500/30 bg-emerald-500/10 p-3.5 rounded-2xl text-center transition-all";
-                dispGanancia.className = "text-2xl font-black text-emerald-400";
-                dispGanancia.innerText = `+${ganancia.toFixed(2)} USDT`;
-            } else {
-                card.className = "border border-rose-500/30 bg-rose-500/10 p-3.5 rounded-2xl text-center transition-all";
-                dispGanancia.className = "text-2xl font-black text-rose-400";
-                dispGanancia.innerText = `${ganancia.toFixed(2)} USDT`;
+            if (dispInv) dispInv.innerText = usdtInvertidos.toFixed(2);
+            if (dispRet) dispRet.innerText = usdtRetornados.toFixed(2);
+
+            if (card && badge && dispGanancia) {
+                if (ganancia >= 0) {
+                    card.className = "border border-emerald-500/30 bg-emerald-500/10 p-3.5 rounded-2xl text-center transition-all";
+                    badge.className = "text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400";
+                    badge.innerText = "Rentable 🟢";
+                    dispGanancia.className = "text-2xl font-black text-emerald-400";
+                    dispGanancia.innerText = `+${ganancia.toFixed(2)} USDT`;
+                } else {
+                    card.className = "border border-rose-500/30 bg-rose-500/10 p-3.5 rounded-2xl text-center transition-all";
+                    badge.className = "text-[9px] font-black px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400";
+                    badge.innerText = "Fricción 🔴";
+                    dispGanancia.className = "text-2xl font-black text-rose-400";
+                    dispGanancia.innerText = `${ganancia.toFixed(2)} USDT`;
+                }
             }
         }
 
@@ -1046,7 +1057,7 @@
         }
 
         // ==========================================
-        // 5. REGISTRO RÁPIDO
+        // 6. FORMULARIO DE REGISTRO RÁPIDO
         // ==========================================
         const CATEGORIAS_GASTOS = {
             "Supermercado": "🛒", "Carnicería / Dieta": "🥩", "Comida / Salidas": "🍔",
@@ -1067,12 +1078,12 @@
             const btnI = document.getElementById('btn-tipo-ingreso');
 
             if (tipo === 'gasto') {
-                btnG.className = "py-2.5 text-xs font-bold rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30";
-                btnI.className = "py-2.5 text-xs font-bold rounded-lg text-slate-400";
+                if (btnG) btnG.className = "py-2.5 text-xs font-bold rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                if (btnI) btnI.className = "py-2.5 text-xs font-bold rounded-lg text-slate-400";
                 categoriaSeleccionada = "Supermercado";
             } else {
-                btnI.className = "py-2.5 text-xs font-bold rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                btnG.className = "py-2.5 text-xs font-bold rounded-lg text-slate-400";
+                if (btnI) btnI.className = "py-2.5 text-xs font-bold rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                if (btnG) btnG.className = "py-2.5 text-xs font-bold rounded-lg text-slate-400";
                 categoriaSeleccionada = "Salario / Ingreso Principal";
             }
             renderCategorias();
@@ -1080,6 +1091,7 @@
 
         function renderCategorias() {
             const cont = document.getElementById('contenedor-categorias');
+            if (!cont) return;
             cont.innerHTML = '';
             const lista = tipoActual === 'gasto' ? CATEGORIAS_GASTOS : CATEGORIAS_INGRESOS;
 
@@ -1097,10 +1109,15 @@
         }
 
         function enviarDatosATelegram() {
-            const monto = document.getElementById('input-monto').value;
-            const concepto = document.getElementById('input-concepto').value || "Registro MiniApp";
-            const moneda = document.getElementById('select-moneda').value;
-            const cuenta = document.getElementById('select-cuenta').value;
+            const inpM = document.getElementById('input-monto');
+            const inpC = document.getElementById('input-concepto');
+            const selMon = document.getElementById('select-moneda');
+            const selCue = document.getElementById('select-cuenta');
+
+            const monto = inpM ? inpM.value : "0";
+            const concepto = (inpC && inpC.value) || "Registro MiniApp";
+            const moneda = selMon ? selMon.value : "USD";
+            const cuenta = selCue ? selCue.value : "Efectivo / Manual";
 
             if (!monto || parseFloat(monto) <= 0) {
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
@@ -1122,17 +1139,12 @@
         }
 
         // ==========================================
-        // ARRANQUE GLOBAL
+        // ARRANQUE GLOBAL INMEDIATO
         // ==========================================
         inicializarInicio();
-        inicializarPresupuesto();
-        inicializarMovimientos();
-        inicializarSobres();
         actualizarVistasMes();
         inicializarCFOPro();
         renderCategorias();
     </script>
-</body>
-</html>
 </body>
 </html>
