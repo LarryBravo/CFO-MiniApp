@@ -37,7 +37,21 @@
             <span id="tasa-bcv-display" class="text-xs font-black text-emerald-400">-- Bs/$</span>
         </div>
     </header>
-
+    <!-- NAVEGADOR DE MESES HISTÓRICOS (SELECTOR TEMPORAL) -->
+    <div class="px-4 pt-3 flex items-center justify-between">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-1 flex items-center justify-between w-full max-w-xs mx-auto shadow-md">
+            <button onclick="cambiarMesRelativo(-1)" id="btn-mes-anterior" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center font-bold active:scale-90 transition-all">
+                ◀
+            </button>
+            <div class="text-center px-2">
+                <span id="mes-activo-label" class="text-xs font-black text-white block capitalize">Septiembre 2026</span>
+                <span id="mes-subtitulo-status" class="text-[9px] text-sky-400 font-semibold block">Mes en curso</span>
+            </div>
+            <button onclick="cambiarMesRelativo(1)" id="btn-mes-siguiente" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center font-bold active:scale-90 transition-all">
+                ▶
+            </button>
+        </div>
+    </div>
     <!-- ============================================================ -->
     <!-- CONTENIDO PRINCIPAL (5 PESTAÑAS)                             -->
     <!-- ============================================================ -->
@@ -369,22 +383,14 @@
         tg.expand();
             // PLANTILLA BASE LIMPIA (Sin datos falsos de muestra)
         let APP_DATA = {
-            patrimonio_total: 0.00, 
-            liquidez_libre: 0.00, 
-            tasa_bcv: 1.0, 
-            corte: "Sincronizando...",
-            ingresos_mes: 0.00, 
-            gastado_mes: 0.00, 
-            ahorro_exigido: 0.00, 
-            dia_actual: 1, 
-            dias_totales: 30,
-            cuentas: [], 
-            otros_activos: [], 
-            deudores: { total: 0, lista: [] },
-            presupuesto: {}, 
-            gastos_por_categoria: {}, 
-            transacciones: [], 
-            sinking_funds: {},
+            patrimonio_total: 0.0, liquidez_libre: 0.0, tasa_bcv: 1.0, corte: "En vivo",
+            cuentas: [], otros_activos: [], deudores: { total: 0, lista: [] },
+            sinking_funds: {}, presupuesto_base: {},
+            meses_data: {
+                "2026-09": { gastado: 0.0, ingresos: 0.0, cats: {}, txs: [] }
+            },
+            mes_activo: "2026-09",
+            dia_actual: 1, dias_totales: 30,
             cfo_progreso: { cuota_bebe: 0, dias_bebe: 0, ahorro_bebe: 0, meta_bebe: 10000 }
         };
 
@@ -395,9 +401,14 @@
             if (encoded) {
                 APP_DATA = Object.assign(APP_DATA, JSON.parse(decodeURIComponent(escape(atob(encoded)))));
             }
-        } catch(e) {
-            console.warn("Usando datos de respaldo:", e);
-        }
+        } catch(e) {}
+
+        // Lista de meses disponibles ordenada
+        const mesesDisponibles = Object.keys(APP_DATA.meses_data).sort();
+        let indiceMesSeleccionado = mesesDisponibles.indexOf(APP_DATA.mes_activo);
+        if (indiceMesSeleccionado === -1) indiceMesSeleccionado = mesesDisponibles.length - 1;
+
+        const NOMBRES_MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
         // ==========================================
         // CONTROL DE NAVEGACIÓN ENTRE LAS 5 PESTAÑAS
@@ -504,6 +515,155 @@
         // ==========================================
         let chartInstancia = null;
         let vistaGraficoActual = 'flujo';
+
+        function cambiarMesRelativo(delta) {
+            const nuevoIndice = indiceMesSeleccionado + delta;
+            if (nuevoIndice >= 0 && nuevoIndice < mesesDisponibles.length) {
+                indiceMesSeleccionado = nuevoIndice;
+                actualizarVistasMes();
+                if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            }
+        }
+
+        function actualizarVistasMes() {
+            const mesClave = mesesDisponibles[indiceMesSeleccionado]; // Ej: "2026-09"
+            const [anio, mesNum] = mesClave.split("-");
+            const nombreMes = NOMBRES_MESES[parseInt(mesNum) - 1];
+
+            // 1. Actualizar selector superior
+            document.getElementById('mes-activo-label').innerText = `${nombreMes} ${anio}`;
+            const esMesActual = (mesClave === APP_DATA.mes_activo);
+            document.getElementById('mes-subtitulo-status').innerText = esMesActual ? "Mes en curso" : "Histórico cerrado";
+            document.getElementById('mes-subtitulo-status').className = esMesActual ? "text-[9px] text-sky-400 font-semibold block" : "text-[9px] text-amber-400 font-semibold block";
+
+            // Deshabilitar botones si llegamos a los extremos
+            document.getElementById('btn-mes-anterior').disabled = (indiceMesSeleccionado === 0);
+            document.getElementById('btn-mes-anterior').style.opacity = (indiceMesSeleccionado === 0) ? "0.3" : "1";
+            
+            document.getElementById('btn-mes-siguiente').disabled = (indiceMesSeleccionado === mesesDisponibles.length - 1);
+            document.getElementById('btn-mes-siguiente').style.opacity = (indiceMesSeleccionado === mesesDisponibles.length - 1) ? "0.3" : "1";
+
+            // 2. Extraer data del mes seleccionado
+            const dataMes = APP_DATA.meses_data[mesClave] || { gastado: 0, ingresos: 0, cats: {}, txs: [] };
+
+            // 3. Actualizar Presupuesto y Stats
+            const costoVida = Object.values(APP_DATA.presupuesto_base).reduce((a, b) => a + b, 0);
+            const ahorroExigido = Math.max(0, dataMes.ingresos - costoVida);
+
+            document.getElementById('stat-ingresos-display').innerText = `$${Math.round(dataMes.ingresos)}`;
+            document.getElementById('stat-gastado-display').innerText = `$${Math.round(dataMes.gastado)}`;
+            document.getElementById('stat-ahorro-display').innerText = `$${Math.round(ahorroExigido)}`;
+
+            // 4. Redibujar Barras de Presupuesto para ese mes
+            const contBarras = document.getElementById('lista-barras-presupuesto');
+            contBarras.innerHTML = '';
+
+            for (const [cat, limite] of Object.entries(APP_DATA.presupuesto_base)) {
+                const gastado = dataMes.cats[cat] || 0;
+                const pct = limite > 0 ? Math.min(100, Math.round((gastado / limite) * 100)) : 100;
+                const color = pct >= 100 ? 'bg-rose-500' : pct > 75 ? 'bg-amber-500' : 'bg-sky-500';
+
+                contBarras.innerHTML += `
+                    <div onclick="irAMovimientosFiltrados('${cat}')" class="cursor-pointer active:opacity-75 transition-all p-2 rounded-xl hover:bg-slate-800/40">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-medium text-slate-200">${cat}</span>
+                            <span class="font-bold text-slate-300">$${gastado} / $${limite} (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div class="${color} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 5. Redibujar Donut Chart
+            renderizarDonutChartMes(dataMes, ahorroExigido);
+
+            // 6. Actualizar Feed de Movimientos para ese mes
+            actualizarMovimientosMes(dataMes.txs);
+        }
+        
+            if (vistaGraficoActual === 'flujo') {
+                chartInstancia = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Gastado', 'Ahorro Seguro', 'Libre'],
+                        datasets: [{
+                            data: [
+                                dataMes.gastado,
+                                Math.min(ahorroExigido, Math.max(0, dataMes.ingresos - dataMes.gastado)),
+                                Math.max(0, dataMes.ingresos - dataMes.gastado - ahorroExigido)
+                            ],
+                            backgroundColor: ['#f43f5e', '#0284c7', '#10b981'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, color: '#94a3b8', font: { size: 9 } } } } }
+                });
+            } else {
+                const labels = Object.keys(dataMes.cats);
+                const dataVals = Object.values(dataMes.cats);
+                const colores = ['#f43f5e', '#fb923c', '#facc15', '#4ade80', '#2dd4bf', '#38bdf8', '#818cf8', '#c084fc', '#f472b6', '#94a3b8', '#cbd5e1'];
+
+                chartInstancia = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels.length > 0 ? labels : ['Sin Gastos'],
+                        datasets: [{
+                            data: dataVals.length > 0 ? dataVals : [1],
+                            backgroundColor: colores.slice(0, Math.max(1, labels.length)),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, color: '#94a3b8', font: { size: 9 } } } } }
+                });
+            }
+        
+
+        function actualizarMovimientosMes(transaccionesMes) {
+            // Actualizar selector de filtro
+            const selectFiltro = document.getElementById('filtro-categoria-movs');
+            selectFiltro.innerHTML = '<option value="TODAS">📁 Todas las categorías</option>';
+
+            const categoriasUnicas = new Set();
+            transaccionesMes.forEach(t => categoriasUnicas.add(t[2]));
+            categoriasUnicas.forEach(cat => selectFiltro.innerHTML += `<option value="${cat}">${cat}</option>`);
+
+            gastosSeleccionados.clear();
+            actualizarBarraLote();
+
+            // Pintar transacciones
+            const cont = document.getElementById('lista-movimientos-completa');
+            cont.innerHTML = '';
+            document.getElementById('contador-transacciones').innerText = `${transaccionesMes.length} gastos`;
+
+            if (transaccionesMes.length === 0) {
+                cont.innerHTML = '<p class="text-slate-500 text-center py-8 text-xs">No hay gastos registrados en este mes.</p>';
+                return;
+            }
+
+            transaccionesMes.forEach(t => {
+                const [id, fecha, cat, concepto, monto] = t;
+                cont.innerHTML += `
+                    <div id="item-tx-${id}" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md">
+                        <input type="checkbox" onchange="toggleSeleccionGasto('${id}')" class="w-4 h-4 accent-rose-500 rounded cursor-pointer">
+                        <div class="flex-1 truncate">
+                            <span class="font-bold text-white text-xs block truncate">${concepto}</span>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[10px] text-slate-400">${fecha}</span>
+                                <span class="text-[9px] bg-slate-800 text-sky-400 px-2 py-0.5 rounded-full border border-slate-700/60 font-medium">${cat}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-xs text-rose-400">-$${monto.toFixed(2)}</span>
+                            <button onclick="eliminarGastoDirecto('${id}', '${concepto}', ${monto})" class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center text-xs active:scale-90 transition-all">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
         function cambiarVistaGrafico(tipo) {
             vistaGraficoActual = tipo;
@@ -967,8 +1127,12 @@
         inicializarInicio();
         inicializarPresupuesto();
         inicializarMovimientos();
+        inicializarSobres();
+        actualizarVistasMes();
         inicializarCFOPro();
         renderCategorias();
     </script>
+</body>
+</html>
 </body>
 </html>
